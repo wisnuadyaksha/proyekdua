@@ -2,9 +2,13 @@
 
 @section('sidebar-menu')
     <li class="nav-item"><a class="nav-link active-link" href="#">Dashboard Siswa</a></li>
-    <li class="nav-item"><a class="nav-link" href="{{ route('peminjaman.create') }}">Pinjam Alat</a></li>
-    <li class="nav-item"><a class="nav-link" href="{{ route('peminjaman.riwayat') }}">Riwayat Saya</a></li>
-@endsection
+  <li class="nav-item">
+    <a class="nav-link" href="#">Pinjam Alat</a>
+</li>
+
+<li class="nav-item">
+    <a class="nav-link" href="#">Riwayat Saya</a>
+</li>
 
 @section('content')
     <h2>Halo, Siswa!</h2>

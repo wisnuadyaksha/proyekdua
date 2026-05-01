@@ -1,56 +1,37 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">Form Pengajuan Peminjaman Alat</h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('peminjaman.store') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label">Nama Peminjam</label>
-                        <input type="text" class="form-control" value="Syekha Nabila (Siswa)" readonly>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Pilih Alat</label>
-                            <select class="form-select">
-                                <option>Multimeter Digital</option>
-                                <option>Solder Dekko</option>
-                                <option>Osiloskop</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Jumlah</label>
-                            <input type="number" class="form-control" min="1" value="1">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Tanggal Pinjam</label>
-                            <input type="date" class="form-control" value="{{ date('Y-m-d') }}">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Estimasi Pengembalian</label>
-                            <input type="date" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Keperluan</label>
-                        <textarea class="form-control" rows="2" placeholder="Contoh: Praktikum Mikrokontroler"></textarea>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success">Ajukan Peminjaman</button>
-                    </div>
-                </form>
-            </div>
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Formulir Peminjaman Alat - Tamu</h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ route('peminjaman.store') }}" method="POST">
+                @csrf
+                <div class="mb-3">
+                    <label class="form-label">Nama Lengkap</label>
+                    <input type="text" name="nama" class="form-control" placeholder="Nama Anda" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Instansi / Asal</label>
+                    <input type="text" name="instansi" class="form-control" placeholder="Contoh: SMKN 2 Indramayu" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Alat yang Dipinjam</label>
+                    <select class="form-select" name="barang_id" required>
+                        <option value="">-- Pilih Alat --</option>
+                        <option value="1">Solder Listrik</option>
+                        <option value="2">Multimeter</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tujuan Peminjaman</label>
+                    <textarea name="tujuan" class="form-control" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-dark">Kirim Permintaan</button>
+                <a href="{{ route('dashboard.tamu') }}" class="btn btn-light border">Batal</a>
+            </form>
         </div>
     </div>
 </div>

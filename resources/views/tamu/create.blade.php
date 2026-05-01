@@ -1,45 +1,47 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <div class="text-center mb-4">
-            <h4 class="fw-bold">FORM KUNJUNGAN TAMU</h4>
-            <p class="text-muted">Workshop SMKN 1 Sindang</p>
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">Formulir Peminjaman Alat (Pihak Luar / Tamu)</h4>
         </div>
-
-        <div class="card shadow border-0">
-            <div class="card-header bg-success text-white text-center py-3">
-                <h5 class="mb-0">Identitas Peminjam (Tamu)</h5>
-            </div>
-            <div class="card-body p-4">
-                <form action="{{ route('dashboard.tamu') }}" method="GET">
-                    {{-- Nama Tamu --}}
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Nama Lengkap</label>
-                        <input type="text" name="nama" class="form-control" placeholder="Masukkan nama instansi atau pribadi" required>
+        <div class="card-body">
+            <form action="{{ route('peminjaman.store') }}" method="POST">
+                @csrf
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" name="nama_tamu" class="form-control" placeholder="Masukkan nama Anda" required>
                     </div>
-
-                    {{-- Jurusan atau Bagian --}}
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Jurusan / Bagian / Asal</label>
-                        <input type="text" name="jurusan" class="form-control" placeholder="Contoh: Teknik Otomasi Industri" required>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Instansi / Asal</label>
+                        <input type="text" name="instansi" class="form-control" placeholder="Contoh: SMKN 2 Indramayu" required>
                     </div>
+                </div>
 
-                    <div class="alert alert-warning small">
-                        <i class="bi bi-info-circle"></i> Data ini digunakan untuk pendataan inventaris workshop selama masa kunjungan/peminjaman.
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label">Pilih Alat yang Ingin Dipinjam</label>
+                    <select class="form-select" name="barang_id" required>
+                        <option value="">-- Pilih Alat --</option>
+                        <option value="1">Solder Listrik</option>
+                        <option value="2">Oscilloscope</option>
+                        <option value="3">Kompresor Air</option>
+                    </select>
+                </div>
 
-                    <button type="submit" class="btn btn-success w-100 py-2 shadow-sm">
-                        Masuk Dashboard Tamu
-                    </button>
-                </form>
-            </div>
-            <div class="card-footer bg-white border-0 text-center pb-4">
-                <a href="/" class="text-decoration-none small text-muted">
-                    <i class="bi bi-arrow-left"></i> Kembali ke Login Utama
-                </a>
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">Keperluan / Tujuan</label>
+                    <textarea class="form-control" name="alasan" rows="3" placeholder="Jelaskan tujuan peminjaman" required></textarea>
+                </div>
+
+                <div class="alert alert-info">
+                    <small>* Peminjaman untuk tamu wajib dikembalikan maksimal pukul 16.00 WIB pada hari yang sama.</small>
+                </div>
+
+                <button type="submit" class="btn btn-dark">Kirim Permintaan</button>
+                <a href="{{ route('dashboard.tamu') }}" class="btn btn-secondary">Batal</a>
+            </form>
         </div>
     </div>
 </div>

@@ -6,10 +6,20 @@ use Illuminate\Http\Request;
 
 class PeminjamanController extends Controller
 {
-    // Menampilkan riwayat peminjaman
+    // Menampilkan daftar peminjaman (Bisa juga jadi halaman riwayat)
     public function index()
     {
         return view('peminjaman.index');
+    }
+
+    // --- INI YANG KURANG DAN HARUS DITAMBAHKAN ---
+    public function riwayat()
+    {
+        // Pastikan kamu punya file resources/views/peminjaman/riwayat.blade.php
+        // Kalau belum ada filenya, sementara bisa return teks dulu:
+        // return "Ini Halaman Riwayat";
+        
+        return view('peminjaman.riwayat');
     }
 
     // Menampilkan form peminjaman baru
