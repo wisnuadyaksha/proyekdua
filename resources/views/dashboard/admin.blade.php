@@ -1,5 +1,16 @@
 @extends('layouts.app')
 
+@section('content')
+<div class="container mt-4">
+    <div class="alert alert-dark">
+        <h4>Selamat Datang, Admin!</h4>
+        <p>Anda masuk ke Panel Kendali Workshop Teknik Otomasi Industri.</p>
+    </div>
+    </div>
+@endsection 
+
+@extends('layouts.app')
+
 @section('sidebar-menu')
     <li class="nav-item"><a class="nav-link active-link" href="#">Dashboard Admin</a></li>
     <li class="nav-item"><a class="nav-link" href="{{ route('barang.index') }}">Kelola Barang</a></li>

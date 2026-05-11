@@ -10,12 +10,20 @@
     <a class="nav-link" href="#">Riwayat Saya</a>
 </li>
 
+@extends('layouts.app')
+
 @section('content')
-    <h2>Halo, Siswa!</h2>
-    <p>Silakan pilih alat yang ingin kamu gunakan di Workshop hari ini.</p>
-    <div class="card mt-3">
-        <div class="card-body">
-            <h5>Status Peminjaman Aktif: <span class="badge bg-success">Tidak Ada</span></h5>
-        </div>
+<div class="container mt-4">
+    <div class="alert alert-primary">
+        <h4>Halo, Siswa!</h4>
+        <p>Silakan pilih alat yang ingin Anda pinjam hari ini.</p>
     </div>
+</div>
 @endsection
+
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif

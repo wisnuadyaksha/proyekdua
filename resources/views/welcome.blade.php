@@ -13,6 +13,12 @@
 </head>
 <body class="bg-white text-slate-900 overflow-x-hidden">
 
+    @if(session('success'))
+    <div class="fixed top-24 right-8 z-[60] bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+        {{ session('success') }}
+    </div>
+    @endif
+
     <nav class="flex justify-between items-center px-8 md:px-16 py-6 bg-white/80 backdrop-blur-md sticky top-0 z-50">
         <div class="flex items-center gap-4">
             <img src="{{ asset('img/logo_smk.png') }}" alt="Logo SMK" class="w-12 h-12">
@@ -22,7 +28,7 @@
             </div>
         </div>
         <div>
-            <a href="/login" class="bg-black text-white px-6 py-2.5 rounded-full font-semibold hover:bg-slate-800 transition-all flex items-center gap-2">
+            <a href="{{ route('login') }}" class="bg-black text-white px-6 py-2.5 rounded-full font-semibold hover:bg-slate-800 transition-all flex items-center gap-2">
                 <i class="fa-solid fa-right-to-bracket text-sm"></i> Login
             </a>
         </div>
@@ -41,18 +47,18 @@
             </p>
             
             <div class="flex flex-col sm:flex-row gap-4">
-                <a href="/login" class="bg-black text-white px-8 py-4 rounded-xl font-bold shadow-2xl shadow-black/20 hover:scale-105 transition-transform text-center">
-                    Sistem Peminjaman Alat
+                <a href="{{ route('peminjaman.tamu') }}" class="bg-black text-white px-8 py-4 rounded-xl font-bold shadow-2xl shadow-black/20 hover:scale-105 transition-transform text-center">
+                    Pinjam Alat (Tamu)
                 </a>
-                <a href="#" class="border-2 border-slate-200 text-slate-700 px-8 py-4 rounded-xl font-bold hover:bg-slate-50 transition-colors text-center">
-                    Tentang Kami
+                
+                <a href="{{ route('login') }}" class="border-2 border-slate-200 text-slate-700 px-8 py-4 rounded-xl font-bold hover:bg-slate-50 transition-colors text-center">
+                    Login Siswa
                 </a>
             </div>
         </div>
 
         <div class="w-full md:w-1/2 relative">
             <img src="{{ asset('img/gedung_sekolah.jpg') }}" alt="SMKN 1 Sindang" class="w-full h-full object-cover">
-            
             <div class="absolute inset-0 bg-gradient-to-r from-white via-transparent to-transparent hidden md:block w-32"></div>
         </div>
     </section>

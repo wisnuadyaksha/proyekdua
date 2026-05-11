@@ -1,63 +1,44 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Tambah Alat Baru</h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('barang.store') }}" method="POST">
-                    @csrf {{-- Keamanan wajib Laravel --}}
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Kode Alat</label>
-                            <input type="text" name="kode_barang" class="form-control" placeholder="Contoh: AL-001" required>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Tambah Alat Baru</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('barang.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label">Nama Barang</label>
+                            <input type="text" name="nama_barang" class="form-control" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Nama Alat</label>
-                            <input type="text" name="nama_barang" class="form-control" placeholder="Nama alat lengkap" required>
+                        <div class="mb-3">
+                            <label class="form-label">Spesifikasi</label>
+                            <textarea name="spesifikasi" class="form-control" rows="3"></textarea>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Kategori</label>
-                        <select name="kategori" class="form-select">
-                            <option value="Elektronika">Elektronika</option>
-                            <option value="Alat Ukur">Alat Ukur</option>
-                            <option value="Mesin">Mesin</option>
-                            <option value="Lainnya">Lainnya</option>
-                        </select>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Jumlah Stok</label>
-                            <input type="number" name="stok" class="form-control" min="1" value="1">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Kategori</label>
+                                <input type="text" name="kategori" class="form-control" placeholder="Contoh: Elektronik" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Stok Total</label>
+                                <input type="number" name="stok_total" class="form-control" min="1" required>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Kondisi Alat</label>
-                            <select name="kondisi" class="form-select">
-                                <option value="Baik">Baik</option>
-                                <option value="Rusak Ringan">Rusak Ringan</option>
-                                <option value="Perlu Perbaikan">Perlu Perbaikan</option>
-                            </select>
+                        <div class="mb-3">
+                            <label class="form-label">Foto Alat (Opsional)</label>
+                            <input type="file" name="foto_barang" class="form-control">
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Deskripsi / Spesifikasi</label>
-                        <textarea name="deskripsi" class="form-control" rows="3" placeholder="Contoh: Solder 40W merk Dekko"></textarea>
-                    </div>
-
-                    <hr>
-                    <div class="d-flex justify-content-end">
-                        <a href="{{ route('barang.index') }}" class="btn btn-secondary me-2">Batal</a>
-                        <button type="submit" class="btn btn-primary">Simpan Data Alat</button>
-                    </div>
-                </form>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ route('barang.index') }}" class="btn btn-secondary">Kembali</a>
+                            <button type="submit" class="btn btn-success">Simpan Data</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -3,78 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SI Peminjaman Alat - SMKN 1 Sindang</title>
-    
+    <title>Sistem Peminjaman - SMKN 1 SINDANG</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         body { background-color: #f8f9fa; }
-        .navbar { margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .nav-link.active { font-weight: bold; color: #0d6efd !important; }
-        .container { background: white; padding: 30px; border-radius: 10px; min-height: 80vh; }
+        .navbar { background-color: #1a1a1a !important; }
+        .main-content { min-height: 80vh; padding-top: 20px; }
     </style>
 </head>
 <body>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">SMKN 1 SINDANG</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
+    <nav class="navbar navbar-expand-lg navbar-dark py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{{ route('dashboard.admin') }}">
+                <i class="bi bi-tools me-2"></i> SMKN 1 SINDANG
+            </a>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    
-                    {{-- MENU UNTUK ADMIN --}}
-                    @if(Request::is('admin/*'))
+                <ul class="navbar-nav ms-auto">
+                    @auth
                         <li class="nav-item">
-                            <a class="nav-link {{ Request::is('admin/dashboard') ? 'active' : '' }}" href="{{ route('dashboard.admin') }}">Dashboard Admin</a>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-danger btn-sm px-3 fw-bold">Logout</button>
+                            </form>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ Request::is('barang*') ? 'active' : '' }}" href="{{ route('barang.index') }}">Data Alat</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('persetujuan.index') }}">Persetujuan</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('laporan.index') }}">Laporan</a>
-                        </li>
-
-                    {{-- MENU UNTUK SISWA --}}
-                    @elseif(Request::is('siswa/*'))
-                        <li class="nav-item">
-                            <a class="nav-link {{ Request::is('siswa/dashboard') ? 'active' : '' }}" href="{{ route('dashboard.siswa') }}">Dashboard Siswa</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('peminjaman.create') }}">Pinjam Alat</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('peminjaman.riwayat') }}">Riwayat Pinjam</a>
-                        </li>
-
-                    {{-- MENU UNTUK TAMU --}}
-                    @elseif(Request::is('tamu/*'))
-                        <li class="nav-item">
-                            <a class="nav-link {{ Request::is('tamu/dashboard') ? 'active' : '' }}" href="{{ route('dashboard.tamu') }}">Dashboard Tamu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('tamu.create') }}">Isi Form Tamu</a>
-                        </li>
-                    @endif
-
-                </ul>
-                
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="/">Keluar</a>
-                    </li>
+                    @endauth
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container border">
+    <div class="container main-content">
         @yield('content')
     </div>
 

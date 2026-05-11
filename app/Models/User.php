@@ -2,47 +2,40 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'name', 'email', 'password', 'role', 'nis', 'class',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
+     * INI KUNCINYA NU!
+     * Memberitahu Laravel kolom mana yang jadi identitas login (NIS atau Email)
      */
+    public function getAuthIdentifierName()
+    {
+        // Jika input login mengandung '@', anggap itu email. Jika tidak, paksa pakai NIS.
+        if (request()->has('login_input')) {
+            return filter_var(request('login_input'), FILTER_VALIDATE_EMAIL) ? 'email' : 'nis';
+        }
+        
+        return 'email'; // Default balik ke email
+    }
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
