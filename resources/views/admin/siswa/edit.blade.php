@@ -4,7 +4,6 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            {{-- Tombol Kembali --}}
             <div class="mb-3">
                 <a href="{{ route('siswa.index') }}" class="text-decoration-none text-muted small">
                     <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar
@@ -18,42 +17,41 @@
                             <i class="bi bi-pencil-square text-warning fs-4"></i>
                         </div>
                         <div>
-                            <h4 class="fw-bold mb-0">Edit Data Siswa</h4>
-                            <p class="text-muted small mb-0">Perbarui informasi siswa yang terpilih</p>
+                            <h4 class="fw-bold mb-0">Edit Data User</h4>
+                            <p class="text-muted small mb-0">Perbarui informasi user yang terpilih</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="card-body p-4">
-                    {{-- Form Update --}}
-                    <form action="{{ route('siswa.update', $siswa->id_siswa) }}" method="POST">
+                    {{-- PENTING: Gunakan $siswa->id (bukan id_siswa) --}}
+                    <form action="{{ route('siswa.update', $siswa->id) }}" method="POST">
                         @csrf
-                        @method('PUT') {{-- PENTING: Laravel butuh ini untuk proses Update --}}
+                        @method('PUT')
                         
-                        {{-- Nama --}}
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-secondary">Nama Lengkap</label>
-                            <input type="text" name="name" class="form-control bg-light" value="{{ $siswa->nama_siswa }}" required>
+                            {{-- PENTING: Gunakan $siswa->name (bukan nama_siswa) --}}
+                            <input type="text" name="name" class="form-control bg-light" value="{{ $siswa->name }}" required>
                         </div>
 
-                        {{-- NIS --}}
                         <div class="mb-3">
                             <label class="form-label small fw-bold text-secondary">NIS</label>
-                            <input type="number" name="nis" class="form-control bg-light" value="{{ $siswa->nis }}" required>
+                            <input type="text" name="nis" class="form-control bg-light" value="{{ $siswa->nis }}" required>
                         </div>
 
-                        {{-- Kelas --}}
                         <div class="mb-4">
                             <label class="form-label small fw-bold text-secondary">Kelas</label>
                             <select name="class" class="form-select bg-light" required>
-                                <option value="XI TOI 1" {{ $siswa->kelas == 'XI TOI 1' ? 'selected' : '' }}>XI TOI 1</option>
-                                <option value="XI TOI 2" {{ $siswa->kelas == 'XI TOI 2' ? 'selected' : '' }}>XI TOI 2</option>
-                                <option value="XII TOI 1" {{ $siswa->kelas == 'XII TOI 1' ? 'selected' : '' }}>XII TOI 1</option>
-                                <option value="XII TOI 2" {{ $siswa->kelas == 'XII TOI 2' ? 'selected' : '' }}>XII TOI 2</option>
+                                {{-- PENTING: Gunakan $siswa->class (bukan kelas) --}}
+                                <option value="XI TOI 1" {{ $siswa->class == 'XI TOI 1' ? 'selected' : '' }}>XI TOI 1</option>
+                                <option value="XI TOI 2" {{ $siswa->class == 'XI TOI 2' ? 'selected' : '' }}>XI TOI 2</option>
+                                <option value="XII TOI 1" {{ $siswa->class == 'XII TOI 1' ? 'selected' : '' }}>XII TOI 1</option>
+                                <option value="XII TOI 2" {{ $siswa->class == 'XII TOI 2' ? 'selected' : '' }}>XII TOI 2</option>
+                                <option value="Staff" {{ $siswa->class == 'Staff' ? 'selected' : '' }}>Staff</option>
                             </select>
                         </div>
 
-                        {{-- Tombol Aksi --}}
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-warning btn-lg rounded-pill fw-bold shadow-sm">
                                 <i class="bi bi-check-circle-fill me-2"></i> Simpan Perubahan

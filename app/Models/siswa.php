@@ -2,34 +2,33 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class User extends Authenticatable
+class Siswa extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = [
-        'name', 
-        'email', 
-        'password', 
-        'role', 
-        'nis', 
-        'class',
-    ];
+    protected $table = 'siswa';
+    protected $primaryKey = 'id_siswa';
 
-    /**
-     * BIARKAN TETAP NIS ATAU EMAIL SECARA STATIS
-     * Karena kamu punya NIS dan Email, biarkan Laravel tahu 
-     * keduanya bisa jadi identitas, tapi di Controller sudah kita urus.
-     */
+    protected $fillable = [
+        'nis', 
+        'nama_siswa', 
+        'kelas', 
+        'password',
+        'role' 
+    ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
+    /**
+     * Pastikan password otomatis di-hash saat disimpan
+     */
     protected function casts(): array
     {
         return [

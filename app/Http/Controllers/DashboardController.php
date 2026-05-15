@@ -3,20 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+// WAJIB TAMBAHKAN BARIS DI BAWAH INI
+use Illuminate\Support\Facades\Auth; 
 
 class DashboardController extends Controller
 {
     public function admin()
     {
-        return view('admin.dashboard'); // Pastikan file resources/views/admin/dashboard.blade.php ADA
+        // Sesuaikan jika filenya ada di resources/views/dashboard/admin.blade.php
+        return view('admin.dashboard');
     }
 
     public function siswa()
+    
     {
-        // Ambil data user yang sedang login untuk ditampilkan di dashboard
+        // Sekarang Auth sudah dikenal karena sudah di-import di atas
         $user = Auth::user();
         
-        // Pastikan folder 'resources/views/siswa/' ada filenya 'dashboard.blade.php'
+        // Memanggil file resources/views/siswa/dashboard.blade.php
         return view('siswa.dashboard', compact('user'));
     }
 }

@@ -2,6 +2,12 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
+    {{-- TOMBOL KEMBALI --}}
+    <div class="mb-3">
+        <a href="{{ route('dashboard.admin') }}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
+        </a>
+    </div>
     <h4 class="fw-bold">Data Tamu / Kunjungan</h4>
     <span class="badge bg-primary rounded-pill">{{ $tamus->count() }} Total Tamu</span>
 </div>

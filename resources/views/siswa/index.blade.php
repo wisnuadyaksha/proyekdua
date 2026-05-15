@@ -2,13 +2,10 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
+    
     <div>
         <h4 class="fw-bold mb-1">Manajemen Data Siswa</h4>
-        {{-- Tombol Kembali --}}
-        <a href="{{ route('dashboard.admin') }}" class="text-decoration-none text-muted small">
-            <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
-        </a>
-    </div>
+
     <a href="{{ route('siswa.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-circle me-1"></i> Tambah Siswa
     </a>

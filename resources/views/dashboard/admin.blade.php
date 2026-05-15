@@ -9,7 +9,6 @@
     </div>
 @endsection 
 
-@extends('layouts.app')
 
 @section('sidebar-menu')
     <li class="nav-item"><a class="nav-link active-link" href="#">Dashboard Admin</a></li>

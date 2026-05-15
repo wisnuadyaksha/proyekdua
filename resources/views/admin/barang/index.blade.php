@@ -2,6 +2,12 @@
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
+    {{-- TOMBOL KEMBALI --}}
+    <div class="mb-3">
+        <a href="{{ route('dashboard.admin') }}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
+        </a>
+    </div>
     <h4 class="fw-bold">Manajemen Inventaris Barang</h4>
     <a href="{{ route('barang.create') }}" class="btn btn-primary">
         <i class="bi bi-plus-circle me-1"></i> Tambah Barang
@@ -32,7 +38,8 @@
                         <td class="px-4">{{ $index + 1 }}</td>
                         <td>
                             @if($item->foto_barang)
-                                <img src="{{ asset('storage/'.$item->foto_barang) }}" alt="foto" width="50" class="rounded">
+                                {{-- Di index.blade.php --}}
+                            <img src="{{ asset('storage/' . $item->foto_barang) }}" alt="foto" width="50" class="rounded">
                             @else
                                 <span class="text-muted small">No Photo</span>
                             @endif

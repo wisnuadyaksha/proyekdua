@@ -10,9 +10,9 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold">Manajemen Data Siswa</h4>
+        <h4 class="fw-bold">Manajemen Data Siswa & User</h4>
         <a href="{{ route('siswa.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i> Tambah Siswa
+            <i class="bi bi-plus-circle me-1"></i> Tambah User
         </a>
     </div>
 
@@ -31,28 +31,35 @@
                     <thead class="table-light">
                         <tr>
                             <th class="px-4 py-3">No</th>
-                            <th>Nama Siswa</th>
+                            <th>Nama</th>
                             <th>NIS</th>
                             <th>Kelas</th>
-                            <th>Status</th>
+                            <th>Role</th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @php $dataSiswa = \App\Models\Siswa::latest('id_siswa')->get(); @endphp
-                        @forelse($dataSiswa as $index => $item)
+                        @forelse($users as $index => $item)
                         <tr class="align-middle">
                             <td class="px-4">{{ $index + 1 }}</td>
-                            <td class="fw-bold text-primary">{{ $item->nama_siswa }}</td>
-                            <td>{{ $item->nis }}</td>
-                            <td><span class="badge bg-secondary">{{ $item->kelas }}</span></td>
-                            <td><span class="badge bg-success bg-opacity-10 text-success">Aktif</span></td>
+                            <td class="fw-bold text-primary">{{ $item->name }}</td>
+                            <td>{{ $item->nis ?? '-' }}</td>
+                            <td><span class="badge bg-secondary">{{ $item->class ?? 'N/A' }}</span></td>
+                            <td>
+                                <span class="badge {{ $item->role == 'admin' ? 'bg-danger' : 'bg-info text-dark' }}">
+                                    {{ ucfirst($item->role) }}
+                                </span>
+                            </td>
                             <td class="text-center">
-                                <a href="{{ route('siswa.edit', $item->id_siswa) }}" class="btn btn-sm btn-light border">
+                                {{-- Tombol Edit --}}
+                                <a href="{{ route('siswa.edit', $item->id) }}" class="btn btn-sm btn-light border">
                                     <i class="bi bi-pencil text-primary"></i>
                                 </a>
-                                <form action="{{ route('siswa.destroy', $item->id_siswa) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin hapus?')">
-                                    @csrf @method('DELETE')
+
+                                {{-- Tombol Hapus --}}
+                                <form action="{{ route('siswa.destroy', $item->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus user ini?')">
+                                    @csrf 
+                                    @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-light border">
                                         <i class="bi bi-trash text-danger"></i>
                                     </button>
@@ -60,7 +67,9 @@
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="6" class="text-center py-4">Data Kosong</td></tr>
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">Data user tidak ditemukan.</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>

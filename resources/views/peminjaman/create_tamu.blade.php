@@ -2,60 +2,94 @@
 
 @section('content')
 <div class="container mt-4">
+    <div class="mb-3">
+        <a href="{{ url('/') }}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Beranda
+        </a>
+    </div>
+    
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-10">
             <div class="card shadow border-0">
                 <div class="card-header bg-warning text-dark text-center">
                     <h5 class="mb-0 font-weight-bold">Formulir Peminjaman Alat (Tamu)</h5>
                 </div>
-                <div class="card-body p-4">
-                    <form action="{{ route('peminjaman.storeTamu') }}" method="POST">
-                        @csrf
-                        
-                        <div class="mb-3">
-                            <label class="form-label font-weight-bold">Nama Lengkap</label>
-                            <input type="text" name="nama_peminjam" class="form-control" placeholder="Masukkan nama sesuai KTP" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label font-weight-bold">Pilih Barang/Alat</label>
-                            <select name="id_barang" class="form-select" required>
-                                <option value="">-- Pilih Alat --</option>
-                                @foreach($barangs as $item)
-                                    <option value="{{ $item->id_barang }}">
-                                        {{ $item->nama_barang }} (Tersedia: {{ $item->stok_tersedia }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label font-weight-bold">Jumlah Pinjam</label>
-                                <input type="number" name="jumlah_pinjam" class="form-control" min="1" required>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        {{-- KOLOM GAMBAR --}}
+                        <div class="col-md-5 bg-light d-flex align-items-center justify-content-center p-3">
+                            <div class="text-center" id="img-placeholder-tamu">
+                                <i class="bi bi-camera" style="font-size: 3rem; color: #ccc;"></i>
+                                <p class="small text-muted">Gambar alat akan muncul di sini</p>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label font-weight-bold">Rencana Tanggal Kembali</label>
-                                <input type="date" name="tgl_kembali" class="form-control" required>
-                            </div>
+                            <img id="preview-img-tamu" src="" class="img-fluid rounded shadow-sm" style="max-height: 300px; object-fit: contain; display: none;">
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label font-weight-bold">Catatan/Tujuan</label>
-                            <textarea name="catatan" class="form-control" rows="2" placeholder="Contoh: Keperluan praktikum rangkaian listrik"></textarea>
+                        {{-- KOLOM FORMULIR --}}
+                        <div class="col-md-7 p-4">
+                            <form action="{{ route('peminjaman.storeTamu') }}" method="POST">
+                                @csrf
+                                <div class="mb-3">
+                                    <label class="form-label font-weight-bold">Nama Lengkap</label>
+                                    <input type="text" name="nama_peminjam" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label font-weight-bold">Nomor Telepon / WhatsApp</label>
+                                    <input type="number" name="no_telp" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label font-weight-bold">Pilih Alat</label>
+                                    <select name="id_barang" id="id_barang_tamu" class="form-control shadow-sm" required>
+                                        <option value="" disabled selected>-- Pilih Alat --</option>
+                                        @foreach($barangs as $b)
+                                            <option value="{{ $b->id_barang }}" data-foto="{{ $b->foto_barang }}">
+                                                {{ $b->nama_barang }} (Stok: {{ $b->stok_total }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold">Jumlah Pinjam</label>
+                                        <input type="number" name="jumlah_pinjam" class="form-control" min="1" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label font-weight-bold">Rencana Kembali</label>
+                                        <input type="date" name="tgl_kembali" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label font-weight-bold">Catatan/Tujuan</label>
+                                    <textarea name="catatan" class="form-control" rows="2"></textarea>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-warning font-weight-bold text-dark">Kirim Permohonan Pinjam</button>
+                                </div>
+                            </form>
                         </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-warning font-weight-bold text-dark">Kirim Permohonan Pinjam</button>
-                            <a href="/" class="btn btn-light border">Batal</a>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
-            <p class="text-center mt-3 text-muted small">
-                *Data Anda akan diverifikasi oleh Admin sebelum alat diberikan.
-            </p>
         </div>
     </div>
 </div>
 @endsection
+
+<script>
+    document.getElementById('id_barang_tamu').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const fotoPath = selectedOption.getAttribute('data-foto'); // Isinya: "alat/AF6p..."
+        const imgElement = document.getElementById('preview-img-tamu');
+        const placeholder = document.getElementById('img-placeholder-tamu');
+
+        if (fotoPath && fotoPath !== "NULL") {
+            placeholder.style.display = 'none';
+            // Menghapus "/alat" karena di database sudah ada kata "alat/"
+            imgElement.src = "{{ asset('storage') }}/" + fotoPath;
+            imgElement.style.display = 'block';
+        } else {
+            placeholder.style.display = 'block';
+            imgElement.style.display = 'none';
+        }
+    });
+</script>

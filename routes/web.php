@@ -1,138 +1,77 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use App\Models\User; // Menggunakan Model User untuk semua (Admin & Siswa)
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\BarangController;
-use App\Http\Controllers\TamuController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PeminjamanController;
-use App\Http\Controllers\PengembalianController;
 use App\Http\Controllers\LaporanController;
 
-/*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
-*/
+// --- RUTE HALAMAN UTAMA & LOGIN ---
 Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+    return redirect()->route('login');
+});
 
-Route::get('/pinjam-tamu', [PeminjamanController::class, 'createTamu'])->name('peminjaman.tamu');
-Route::post('/pinjam-tamu/store', [PeminjamanController::class, 'storeTamu'])->name('peminjaman.storeTamu');
-
-// Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-/*
-|--------------------------------------------------------------------------
-| Protected Routes (Wajib Login)
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth'])->group(function () {
 
-    // Dashboard
-    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('dashboard.admin');
-    Route::get('/siswa/dashboard', [DashboardController::class, 'siswa'])->name('dashboard.siswa');
+// --- RUTE PEMINJAMAN TAMU (Tanpa Login) ---
+// Ini yang tadi error karena method createTamu belum ada di Controller
+Route::get('/peminjaman/tamu', [PeminjamanController::class, 'createTamu'])->name('peminjaman.tamu');
+Route::post('/peminjaman/tamu', [PeminjamanController::class, 'storeTamu'])->name('peminjaman.storeTamu');
 
-    // Manajemen Barang
-    Route::resource('barang', BarangController::class);
 
-    // Peminjaman
-    Route::get('/peminjaman/riwayat', [PeminjamanController::class, 'riwayat'])->name('peminjaman.riwayat');
-    Route::resource('peminjaman', PeminjamanController::class);
+// --- RUTE KHUSUS ADMIN (Perlu Login & Role Admin) ---
+Route::middleware(['auth'])->prefix('admin')->group(function () {
+    
+    // Dashboard Admin
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard.admin');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Fitur Khusus Admin
-    |--------------------------------------------------------------------------
-    */
-    Route::prefix('admin')->group(function () {
-        
-        // Data Tamu
-        Route::get('/tamu', [TamuController::class, 'index'])->name('tamu.index');
+    Route::get('/persetujuan', [AdminController::class, 'indexPersetujuan'])->name('persetujuan.index');
+    Route::put('/persetujuan/{id}/update', [AdminController::class, 'updateStatus'])->name('persetujuan.update');
 
-        // Persetujuan Peminjaman
-        Route::get('/persetujuan', [PeminjamanController::class, 'persetujuan'])->name('persetujuan.index');
-        Route::put('/persetujuan/{id}', [PeminjamanController::class, 'update'])->name('persetujuan.update');
+    Route::get('/barang', [AdminController::class, 'indexBarang'])->name('barang.index');
+    Route::get('/barang/create', [AdminController::class, 'createBarang'])->name('barang.create');
+    Route::post('/barang', [AdminController::class, 'storeBarang'])->name('barang.store');
+    Route::get('/barang/{id}/edit', [AdminController::class, 'editBarang'])->name('barang.edit');
+    Route::put('/barang/{id}', [AdminController::class, 'updateBarang'])->name('barang.update');
+    Route::delete('/barang/{id}', [AdminController::class, 'destroyBarang'])->name('barang.destroy');
 
-        // Pengembalian & Laporan
-        Route::get('/pengembalian', [PengembalianController::class, 'index'])->name('pengembalian.index');
-        Route::post('/pengembalian/store', [PengembalianController::class, 'store'])->name('pengembalian.store');
-        Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/tamu', [AdminController::class, 'indexTamu'])->name('tamu.index');
 
-        /* |--------------------------------------------------------------------------
-        | Manajemen Siswa (CRUD menggunakan tabel Users)
-        |--------------------------------------------------------------------------
-        */
-        
-        // 1. Menampilkan Tabel Siswa (Filter user yang rolenya 'siswa')
-        Route::get('/siswa-manajemen', function() {
-            $users = User::where('role', 'siswa')->get();
-            return view('admin.siswa.index', compact('users'));
-        })->name('siswa.index');
+    Route::get('/pengembalian', [AdminController::class, 'indexPengembalian'])->name('pengembalian.index');
+    Route::put('/pengembalian/{id}', [AdminController::class, 'prosesPengembalian'])->name('pengembalian.proses');
+    
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/cetak', [LaporanController::class, 'cetak'])->name('laporan.cetak');
 
-        // 2. Menampilkan Form Tambah Siswa
-        Route::get('/siswa-manajemen/tambah', function() {
-            return view('admin.siswa.create');
-        })->name('siswa.create');
 
-        // 3. Proses Simpan Data Siswa Baru ke tabel 'users'
-        Route::post('/siswa-manajemen/tambah', function(Request $request) {
-            $request->validate([
-                'name' => 'required',
-                'nis'  => 'required|unique:users,nis',
-                'class'=> 'required',
-            ]);
+    // Manajemen Siswa (AdminController)
+    Route::get('/siswa', [AdminController::class, 'indexSiswa'])->name('siswa.index');
+    Route::get('/siswa/create', [AdminController::class, 'createSiswa'])->name('siswa.create');
+    Route::post('/siswa', [AdminController::class, 'storeSiswa'])->name('siswa.store');
+    Route::get('/siswa/{id}/edit', [AdminController::class, 'editSiswa'])->name('siswa.edit');
+    Route::put('/siswa/{id}', [AdminController::class, 'updateSiswa'])->name('siswa.update');
+    Route::delete('/siswa/{id}', [AdminController::class, 'destroySiswa'])->name('siswa.destroy');
 
-            User::create([
-                'name'     => $request->name,
-                'nis'      => $request->nis,
-                'class'    => $request->class,
-                'email'    => $request->nis . '@siswa.com', // Buat email dummy otomatis
-                'password' => bcrypt('password123'),        // Password default
-                'role'     => 'siswa',
-            ]);
+    // Laporan (LaporanController)
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+});
 
-            return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil disimpan!');
-        })->name('siswa.store');
 
-        // 4. Menampilkan Form Edit Siswa
-        Route::get('/siswa-manajemen/{id}/edit', function($id) {
-            $siswa = User::findOrFail($id);
-            return view('admin.siswa.edit', compact('siswa'));
-        })->name('siswa.edit');
+// --- RUTE KHUSUS SISWA (Perlu Login & Role Siswa) ---
+Route::middleware(['auth'])->prefix('siswa')->group(function () {
+    
+    Route::get('/dashboard', function () {
+        return view('siswa.dashboard');
+    })->name('dashboard.siswa');
 
-        // 5. Proses Update Data Siswa
-        Route::put('/siswa-manajemen/{id}', function(Request $request, $id) {
-            $siswa = User::findOrFail($id);
-            
-            $request->validate([
-                'name' => 'required',
-                'nis'  => 'required|unique:users,nis,'.$id,
-                'class'=> 'required',
-            ]);
-
-            $siswa->update([
-                'name'  => $request->name,
-                'nis'   => $request->nis,
-                'class' => $request->class,
-            ]);
-
-            return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diperbarui!');
-        })->name('siswa.update');
-
-        // 6. Proses Hapus Data Siswa
-        Route::delete('/siswa-manajemen/{id}', function($id) {
-            $siswa = User::findOrFail($id);
-            $siswa->delete();
-
-            return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil dihapus!');
-        })->name('siswa.destroy');
-
-    });
+    // Rute peminjaman alat untuk siswa yang sudah login
+    Route::get('/pinjam', [PeminjamanController::class, 'createSiswa'])->name('peminjaman.siswa');
+    Route::post('/pinjam', [PeminjamanController::class, 'storeSiswa'])->name('peminjaman.siswa.store');
+    // Rute untuk Tabel Riwayat (Riwayat)
+    Route::get('/riwayat', [PeminjamanController::class, 'riwayatSiswa'])->name('peminjaman.riwayat');
 });

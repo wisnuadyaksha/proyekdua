@@ -6,6 +6,10 @@
     <p class="text-muted">Daftar permintaan peminjaman alat dari siswa dan tamu.</p>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
 <div class="card shadow-sm">
     <div class="card-body">
         <table class="table table-hover align-middle">
@@ -20,29 +24,40 @@
                 </tr>
             </thead>
             <tbody>
-                {{-- Contoh data yang masuk --}}
+                @foreach($pinjamans as $p)
                 <tr>
-                    <td>23 April 2026</td>
-                    <td><strong>Wisnu Adyaksa</strong> <br><small class="text-muted">Siswa - SIKC 2D</small></td>
-                    <td>Multimeter Digital</td>
-                    <td>1</td>
-                    <td><span class="badge bg-info">Menunggu</span></td>
+                    <td>{{ \Carbon\Carbon::parse($p->tgl_pinjam)->format('d F Y') }}</td>
+                    <td>
+                        <strong>{{ $p->siswa->name ?? $p->nama_tamu }}</strong> 
+                        <br>
+                        <small class="text-muted">
+                            {{ $p->id_siswa ? 'Siswa - ' . ($p->siswa->class ?? '-') : 'Tamu' }}
+                        </small>
+                    </td>
+                    <td>{{ $p->barang->nama_barang ?? 'Alat Tidak Ditemukan' }}</td>
+                    <td>{{ $p->jumlah_pinjam }}</td>
+                    <td><span class="badge bg-info">{{ $p->status }}</span></td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-success">Setujui</button>
-                        <button class="btn btn-sm btn-danger">Tolak</button>
+                        <div class="d-flex justify-content-center gap-2">
+                            {{-- Tombol Setujui --}}
+                            <form action="{{ route('persetujuan.update', $p->id_peminjaman) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="status" value="Dipinjam">
+                                <button type="submit" class="btn btn-sm btn-success">Setujui</button>
+                            </form>
+
+                            {{-- Tombol Tolak --}}
+                            <form action="{{ route('persetujuan.update', $p->id_peminjaman) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="status" value="Ditolak">
+                                <button type="submit" class="btn btn-sm btn-danger">Tolak</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
-                <tr>
-                    <td>23 April 2026</td>
-                    <td><strong>Syekha Nabila</strong> <br><small class="text-muted">Siswa - SIKC 2D</small></td>
-                    <td>Solder Dekko</td>
-                    <td>2</td>
-                    <td><span class="badge bg-info">Menunggu</span></td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-success">Setujui</button>
-                        <button class="btn btn-sm btn-danger">Tolak</button>
-                    </td>
-                </tr>
+                @endforeach
             </tbody>
         </table>
     </div>

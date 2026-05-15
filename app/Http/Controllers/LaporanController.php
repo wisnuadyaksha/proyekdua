@@ -9,21 +9,21 @@ use Illuminate\Http\Request;
 class LaporanController extends Controller
 {
     /**
-     * Menampilkan halaman laporan dengan filter tanggal
+     * Menampilkan halaman laporan dengan relasi yang diperbaiki.
      */
     public function index(Request $request)
     {
-        // Query dasar dengan relasi
-        $query = Peminjaman::with(['barang', 'siswa']);
+        // PERBAIKAN: Memastikan relasi 'siswa' dan 'barang' dipanggil agar nama tidak kosong
+        $query = Peminjaman::with(['siswa', 'barang']);
 
-        // Filter berdasarkan tanggal jika diinput
-        if ($request->has('tgl_mulai') && $request->has('tgl_selesai')) {
+        // Filter berdasarkan tanggal jika ada input dari user
+        if ($request->filled('tgl_mulai') && $request->filled('tgl_selesai')) {
             $query->whereBetween('tgl_pinjam', [$request->tgl_mulai, $request->tgl_selesai]);
         }
 
         $laporans = $query->latest()->get();
 
-        // Statistik ringkas untuk dashboard laporan
+        // Statistik tambahan untuk laporan
         $total_pinjam = Peminjaman::count();
         $total_barang = Barang::sum('stok_total');
 

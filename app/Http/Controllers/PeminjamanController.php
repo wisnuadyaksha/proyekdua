@@ -9,94 +9,101 @@ use Illuminate\Support\Facades\Auth;
 
 class PeminjamanController extends Controller
 {
-    public function index()
+    // 1. Fungsi untuk menampilkan halaman dashboard tamu (Opsional)
+    public function indexTamu()
     {
-        $peminjamans = Peminjaman::with(['barang', 'siswa'])->latest()->get();
-        return view('peminjaman.index', compact('peminjamans'));
+        return view('peminjaman.tamu');
     }
 
-    public function persetujuan()
+    // 2. Fungsi untuk menampilkan FORMULIR pinjam buat TAMU
+    public function createTamu()
     {
-        // Nama variabel WAJIB $peminjamans agar cocok dengan Blade
-        $peminjamans = Peminjaman::with(['siswa', 'barang'])
-                        ->where('status', 'Menunggu Persetujuan')
-                        ->latest()
-                        ->get();
-
-        return view('admin.persetujuan.index', compact('peminjamans'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        // Menggunakan findOrFail agar jika ID tidak ketemu langsung lari ke 404, bukan error crash
-        $peminjaman = Peminjaman::findOrFail($id);
-        
-        $peminjaman->status = $request->status;
-        $peminjaman->save();
-
-        if ($request->status == 'Dipinjam' || $request->status == 'Kembali') {
-            $barang = Barang::find($peminjaman->id_barang);
-            if ($barang) {
-                $barang->decrement('stok_tersedia', $peminjaman->jumlah_pinjam);
-            }
-        }
-
-        return redirect()->route('persetujuan.index')->with('success', 'Status berhasil diperbarui!');
-    }
-
-    // Fungsi lainnya (riwayat, create, store) tetap sama seperti sebelumnya
-    public function riwayat()
-    {
-        $riwayats = Peminjaman::where('id_siswa', Auth::user()->id_siswa)->with('barang')->latest()->get();
-        return view('peminjaman.riwayat', compact('riwayats'));
-    }
-
-    public function create() {
-        $barangs = Barang::where('stok_tersedia', '>', 0)->get();
-        return view('peminjaman.create', compact('barangs'));
-    }
-
-    public function createTamu() {
-        $barangs = Barang::where('stok_tersedia', '>', 0)->get();
+        // Pastikan kolomnya 'stok_total' atau sesuaikan dengan database lu
+        $barangs = Barang::where('stok_total', '>', 0)->get();
         return view('peminjaman.create_tamu', compact('barangs'));
     }
 
-    public function store(Request $request) {
+    // 3. Fungsi untuk simpan data pinjam TAMU
+    public function storeTamu(Request $request)
+    {
         $request->validate([
-            'id_barang' => 'required',
-            'jumlah_pinjam' => 'required|numeric|min:1',
-            'tgl_pinjam' => 'required|date',
+            'nama_peminjam' => 'required|string|max:255',
+            'id_barang'     => 'required',
+            'jumlah_pinjam' => 'required|integer|min:1',
         ]);
+
         $barang = Barang::findOrFail($request->id_barang);
-        if ($barang->stok_tersedia < $request->jumlah_pinjam) {
-            return back()->with('error', 'Stok tidak mencukupi!');
+
+        // Cek stok (sesuaikan nama kolom stok_total/stok_tersedia)
+        if ($barang->stok_total < $request->jumlah_pinjam) {
+            return back()->with('error', 'Stok barang tidak mencukupi!');
         }
-        Peminjaman::create([
-            'id_siswa' => Auth::user()->id_siswa,
-            'id_barang' => $request->id_barang,
-            'jumlah_pinjam' => $request->jumlah_pinjam,
-            'tgl_pinjam' => $request->tgl_pinjam ?? now(),
-            'status' => 'Menunggu Persetujuan',
-        ]);
-        return redirect()->route('dashboard.siswa')->with('success', 'Peminjaman diajukan!');
+        // Simpan ke database
+           Peminjaman::create([
+        'nama_tamu'     => $request->nama_peminjam,
+        'id_barang'     => $request->id_barang,
+        'jumlah_pinjam' => $request->jumlah_pinjam,
+        'tgl_pinjam'    => now(),
+        'status'        => 'Dipinjam',
+        'catatan'       => "No. Telp: " . $request->no_telp . " | " . $request->catatan, // Simpan no telp ke catatan
+    ]);
+
+        // Kurangi stok barang
+        $barang->decrement('stok_total', $request->jumlah_pinjam);
+
+        return redirect()->route('login')->with('success', 'Peminjaman berhasil diajukan!');
+    }
+    
+
+    // Form Pinjam untuk SISWA
+    public function createSiswa()
+    {
+        // Mengambil barang yang stoknya tersedia
+        $barangs = Barang::where('stok_total', '>', 0)->get();
+        
+        // Pastikan kamu punya file: resources/views/siswa/pinjam_alat.blade.php
+        return view('peminjaman.create', compact('barangs'));
     }
 
-    public function storeTamu(Request $request) {
+    // Simpan Pinjam untuk SISWA
+    public function storeSiswa(Request $request)
+    {
         $request->validate([
-            'nama_peminjam' => 'required|string|max:100',
-            'id_barang' => 'required',
-            'jumlah_pinjam' => 'required|numeric|min:1',
-            'tgl_kembali' => 'required|date|after_or_equal:today',
+            'id_barang'     => 'required|exists:barang,id_barang',
+            'jumlah_pinjam' => 'required|integer|min:1',
         ]);
+
+        $barang = Barang::findOrFail($request->id_barang);
+
+        if ($barang->stok_total < $request->jumlah_pinjam) {
+            return back()->with('error', 'Stok alat tidak mencukupi!');
+        }
+
         Peminjaman::create([
-            'nama_tamu' => $request->nama_peminjam,
-            'id_barang' => $request->id_barang,
-            'jumlah_pinjam' => $request->jumlah_pinjam,
-            'tgl_pinjam' => now(),
-            'tgl_kembali' => $request->tgl_kembali,
-            'status' => 'Menunggu Persetujuan',
-            'catatan' => $request->catatan,
-        ]);
-        return redirect()->route('home')->with('success', 'Peminjaman tamu terkirim!');
+    'id_siswa'      => auth()->id(), // Mengambil ID siswa yang sedang login
+    'id_barang'     => $request->id_barang,
+    'jumlah_pinjam' => $request->jumlah_pinjam,
+    'tgl_pinjam'    => now(),
+    'status'        => 'Menunggu Persetujuan',
+    'nama_tamu'     => null, // Karena ini siswa, nama_tamu dikosongkan
+    ]);
+
+    
+        
+        return redirect()->route('dashboard.siswa')->with('success', 'Permintaan peminjaman berhasil dikirim!');
     }
-}
+
+    // ... (fungsi createTamu dan storeTamu kamu tetap biarkan di bawahnya)
+
+    public function riwayatSiswa()
+    {
+        // Mengambil data peminjaman milik siswa yang sedang login
+        $riwayats = Peminjaman::with('barang')
+                    ->where('id_siswa', auth()->id())
+                    ->latest()
+                    ->get();
+
+        // Pastikan variabel yang dikirim bernama 'riwayats'
+        return view('peminjaman.riwayat', compact('riwayats'));
+    }
+} // Pastikan kurung kurawal penutup Class cuma ada SATU di paling bawah

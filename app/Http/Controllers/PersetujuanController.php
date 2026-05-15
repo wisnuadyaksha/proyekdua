@@ -32,4 +32,32 @@ class PersetujuanController extends Controller
 
         return redirect()->back()->with('success', 'Status peminjaman berhasil diperbarui!');
     }
+
+    public function indexTamu()
+    {
+        return view('peminjaman.tamu');
+    }
+
+    public function createTamu()
+    {
+        $barangs = Barang::where('stok_total', '>', 0)->get();
+        return view('peminjaman.create_tamu', compact('barangs'));
+    }
+
+    // SIMPAN PINJAM TAMU
+    public function storeTamu(Request $request)
+    {
+        $request->validate([
+            'nama_peminjam' => 'required|string|max:255',
+            'id_barang'     => 'required',
+            'jumlah_pinjam' => 'required|integer|min:1',
+        ]);
+
+        $barang = Barang::findOrFail($request->id_barang);
+
+        if ($barang->stok_total < $request->jumlah_pinjam) {
+            return back()->with('error', 'Stok barang tidak mencukupi!');
+        }
+}
+
 }
