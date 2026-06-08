@@ -49,18 +49,30 @@
                         </div>
 
                         {{-- Input Kelas --}}
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label small fw-bold text-secondary">Kelas / Jurusan</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-mortarboard text-muted"></i></span>
                                 <select name="class" class="form-select bg-light border-start-0" required>
                                     <option value="" selected disabled>Pilih Kelas...</option>
+                                    <option value="X TOI 1">X TOI 1</option>
+                                    <option value="X TOI 2">X TOI 2</option>
                                     <option value="XI TOI 1">XI TOI 1</option>
                                     <option value="XI TOI 2">XI TOI 2</option>
                                     <option value="XII TOI 1">XII TOI 1</option>
                                     <option value="XII TOI 2">XII TOI 2</option>
                                 </select>
                             </div>
+                        </div>
+
+                        {{-- Input Password --}}
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-secondary">Password Akun (Otomatis & Bisa Diubah)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                                <input type="text" name="password" class="form-control bg-light border-start-0" value="siswa123" required>
+                            </div>
+                            <small class="text-muted d-block mt-1">Default: <b>siswa123</b>. Bisa diganti jika ingin.</small>
                         </div>
 
                         {{-- Action Buttons --}}

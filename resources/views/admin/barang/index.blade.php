@@ -38,8 +38,10 @@
                         <td class="px-4">{{ $index + 1 }}</td>
                         <td>
                             @if($item->foto_barang)
-                                {{-- Di index.blade.php --}}
-                            <img src="{{ asset('storage/' . $item->foto_barang) }}" alt="foto" width="50" class="rounded">
+                                @php
+                                    $filename = str_replace('alat/', '', $item->foto_barang);
+                                @endphp
+                                <img src="{{ asset('img/alat/' . $filename) }}" alt="foto" width="50" class="rounded" style="object-fit: cover; height: 50px;">
                             @else
                                 <span class="text-muted small">No Photo</span>
                             @endif

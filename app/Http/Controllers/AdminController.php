@@ -27,6 +27,7 @@ class AdminController extends Controller
             'name' => 'required',
             'nis'  => 'required|unique:users,nis',
             'class'=> 'required',
+            'password' => 'required|min:6',
         ]);
 
         User::create([
@@ -34,11 +35,11 @@ class AdminController extends Controller
             'nis'      => $request->nis,
             'class'    => $request->class,
             'email'    => $request->nis . '@siswa.com',
-            'password' => bcrypt('password123'),
+            'password' => bcrypt($request->password),
             'role'     => 'siswa',
         ]);
 
-        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil disimpan!');
+        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil disimpan dan akun dibuat!');
     }
 
     public function editSiswa($id)
@@ -56,14 +57,21 @@ class AdminController extends Controller
             'name' => 'required',
             'nis'  => 'required|unique:users,nis,'.$id,
             'class'=> 'required',
+            'password' => 'nullable|min:6',
         ]);
 
-        // Mengupdate kolom name dan class sesuai struktur tabel users
-        $siswa->update([
+        $dataToUpdate = [
             'name'  => $request->name,
             'nis'   => $request->nis,
             'class' => $request->class,
-        ]);
+        ];
+
+        // Hanya update password jika field password diisi
+        if ($request->filled('password')) {
+            $dataToUpdate['password'] = bcrypt($request->password);
+        }
+
+        $siswa->update($dataToUpdate);
 
         return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil diperbarui!');
     }
@@ -100,13 +108,27 @@ class AdminController extends Controller
         $request->validate([
             'nama_barang' => 'required',
             'stok_total'  => 'required|integer|min:0',
+            'kategori'    => 'nullable|string',
+            'spesifikasi' => 'nullable|string',
+            'foto_barang' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        $fotoPath = null;
+        if ($request->hasFile('foto_barang')) {
+            $file = $request->file('foto_barang');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('img/alat'), $filename);
+            $fotoPath = $filename;
+        }
+
         Barang::create([
-        'nama_barang'   => $request->nama_barang,
-        'stok_total'    => $request->stok_total,
-        'stok_tersedia' => $request->stok_total, // TAMBAHKAN BARIS INI
-    ]);
+            'nama_barang'   => $request->nama_barang,
+            'stok_total'    => $request->stok_total,
+            'stok_tersedia' => $request->stok_total,
+            'kategori'      => $request->kategori,
+            'spesifikasi'   => $request->spesifikasi,
+            'foto_barang'   => $fotoPath,
+        ]);
 
         return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambah!');
     }
@@ -120,7 +142,33 @@ class AdminController extends Controller
     // Mengupdate data barang
     public function updateBarang(Request $request, $id) {
         $barang = Barang::findOrFail($id);
-        $barang->update($request->all());
+        
+        $request->validate([
+            'nama_barang' => 'required',
+            'stok_total'  => 'required|integer|min:0',
+            'kategori'    => 'nullable|string',
+            'spesifikasi' => 'nullable|string',
+            'foto_barang' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $data = [
+            'nama_barang' => $request->nama_barang,
+            'stok_total'  => $request->stok_total,
+            'kategori'    => $request->kategori,
+            'spesifikasi' => $request->spesifikasi,
+        ];
+
+        // Hitung stok_tersedia baru jika stok_total diubah (Asumsi sederhana: kita tidak ubah stok_tersedia otomatis, atau hanya update dari selisih, tapi untuk simplicity kita biarkan, admin mungkin harus menyesuaikan manual atau kita update jika diperlukan)
+        // Kita biarkan stok_tersedia sesuai logika aplikasi atau update juga jika perlu
+        
+        if ($request->hasFile('foto_barang')) {
+            $file = $request->file('foto_barang');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('img/alat'), $filename);
+            $data['foto_barang'] = $filename;
+        }
+
+        $barang->update($data);
         return redirect()->route('barang.index')->with('success', 'Data barang diperbarui!');
     }
 
@@ -145,10 +193,14 @@ class AdminController extends Controller
     {
         // PERBAIKAN: Gunakan $peminjaman (tanpa 's') agar konsisten ke bawah
         $peminjaman = Peminjaman::findOrFail($id); 
-        $barang = Barang::findOrFail($peminjaman->id_barang);
+        $barang = Barang::find($peminjaman->id_barang);
 
-        // Menambah stok saat barang dikembalikan
-        $barang->increment('stok_total', $peminjaman->jumlah_pinjam);
+        // Menambah stok saat barang dikembalikan (jika barangnya masih ada)
+        if ($barang) {
+            $barang->increment('stok_total', $peminjaman->jumlah_pinjam);
+            // Tambahkan juga stok_tersedia agar seimbang
+            $barang->increment('stok_tersedia', $peminjaman->jumlah_pinjam);
+        }
 
         $peminjaman->update([ 
             'status' => 'Dikembalikan',
@@ -158,13 +210,17 @@ class AdminController extends Controller
         return back()->with('success', 'Barang telah berhasil dikembalikan!');
     }
 
-   public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, $id)
     {
         $peminjaman = Peminjaman::findOrFail($id);
         
         if ($request->status == 'Dipinjam') {
-            $barang = Barang::findOrFail($peminjaman->id_barang);
+            $barang = Barang::find($peminjaman->id_barang);
             
+            if (!$barang) {
+                return back()->with('error', 'Gagal disetujui! Barang tersebut sudah tidak ada / telah dihapus.');
+            }
+
             // PERBAIKAN: Kurangi stok di kedua kolom (total & tersedia) agar sisa barang berkurang
             $barang->decrement('stok_total', $peminjaman->jumlah_pinjam);
             $barang->decrement('stok_tersedia', $peminjaman->jumlah_pinjam);

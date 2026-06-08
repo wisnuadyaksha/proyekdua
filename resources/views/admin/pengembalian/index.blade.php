@@ -26,8 +26,8 @@
                 <tbody>
                     @forelse($pinjamans as $p)
                     <tr>
-                        <td>{{ $p->id_siswa ? $p->siswa->name : $p->nama_tamu }}</td>
-                        <td>{{ $p->barang->nama_barang }}</td>
+                        <td>{{ $p->id_siswa ? ($p->siswa->name ?? 'User Dihapus') : $p->nama_tamu }}</td>
+                        <td>{{ $p->barang->nama_barang ?? 'Barang Telah Dihapus' }}</td>
                         <td>{{ $p->jumlah_pinjam }}</td>
                         <td>
                             <form action="{{ route('pengembalian.proses', $p->id_peminjaman) }}" method="POST">

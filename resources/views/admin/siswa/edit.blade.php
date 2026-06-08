@@ -40,16 +40,24 @@
                             <input type="text" name="nis" class="form-control bg-light" value="{{ $siswa->nis }}" required>
                         </div>
 
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label class="form-label small fw-bold text-secondary">Kelas</label>
                             <select name="class" class="form-select bg-light" required>
                                 {{-- PENTING: Gunakan $siswa->class (bukan kelas) --}}
+                                <option value="X TOI 1" {{ $siswa->class == 'X TOI 1' ? 'selected' : '' }}>X TOI 1</option>
+                                <option value="X TOI 2" {{ $siswa->class == 'X TOI 2' ? 'selected' : '' }}>X TOI 2</option>
                                 <option value="XI TOI 1" {{ $siswa->class == 'XI TOI 1' ? 'selected' : '' }}>XI TOI 1</option>
                                 <option value="XI TOI 2" {{ $siswa->class == 'XI TOI 2' ? 'selected' : '' }}>XI TOI 2</option>
                                 <option value="XII TOI 1" {{ $siswa->class == 'XII TOI 1' ? 'selected' : '' }}>XII TOI 1</option>
                                 <option value="XII TOI 2" {{ $siswa->class == 'XII TOI 2' ? 'selected' : '' }}>XII TOI 2</option>
                                 <option value="Staff" {{ $siswa->class == 'Staff' ? 'selected' : '' }}>Staff</option>
                             </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-secondary">Reset Password (Opsional)</label>
+                            <input type="text" name="password" class="form-control bg-light" placeholder="Isi jika ingin mereset password user ini">
+                            <small class="text-muted">Biarkan kosong jika tidak ingin mengubah password.</small>
                         </div>
 
                         <div class="d-grid gap-2">

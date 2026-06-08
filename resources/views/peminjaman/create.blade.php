@@ -10,8 +10,14 @@
     <div class="card shadow-sm border-0" style="border-radius: 15px;">
         <div class="card-header bg-dark text-white" style="border-radius: 15px 15px 0 0;">
             <h5 class="mb-0 py-1"><i class="bi bi-file-earmark-text me-2"></i>Formulir Peminjaman Alat</h5>
-        
         </div>
+
+        @if(session('error'))
+            <div class="alert alert-danger m-3">{{ session('error') }}</div>
+        @endif
+        @if(session('success'))
+            <div class="alert alert-success m-3">{{ session('success') }}</div>
+        @endif
         <div class="card-body p-0">
             <div class="row g-0">
                 {{-- KOLOM GAMBAR --}}
@@ -70,23 +76,29 @@
         </div>
     </div>
 </div>
-@endsection
 
 <script>
-    document.getElementById('id_barang').addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const fotoPath = selectedOption.getAttribute('data-foto'); // Isinya: "alat/AF6p..."
-        const imgElement = document.getElementById('preview-img');
-        const placeholder = document.getElementById('img-placeholder');
+    document.addEventListener("DOMContentLoaded", function() {
+        const idBarangSelect = document.getElementById('id_barang');
+        
+        if(idBarangSelect) {
+            idBarangSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const fotoPath = selectedOption.getAttribute('data-foto');
+                const imgElement = document.getElementById('preview-img');
+                const placeholder = document.getElementById('img-placeholder');
 
-        if (fotoPath && fotoPath !== "NULL") {
-            placeholder.style.display = 'none';
-            // Menghapus "/alat" karena di database sudah ada kata "alat/"
-            imgElement.src = "{{ asset('storage') }}/" + fotoPath; 
-            imgElement.style.display = 'block';
-        } else {
-            placeholder.style.display = 'block';
-            imgElement.style.display = 'none';
+                if (fotoPath && fotoPath !== "NULL" && fotoPath !== "") {
+                    placeholder.style.display = 'none';
+                    const filename = fotoPath.replace(/^alat\//, '');
+                    imgElement.src = "{{ asset('img/alat') }}/" + filename; 
+                    imgElement.style.display = 'block';
+                } else {
+                    placeholder.style.display = 'block';
+                    imgElement.style.display = 'none';
+                }
+            });
         }
     });
 </script>
+@endsection

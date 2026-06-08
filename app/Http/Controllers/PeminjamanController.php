@@ -39,14 +39,15 @@ class PeminjamanController extends Controller
             return back()->with('error', 'Stok barang tidak mencukupi!');
         }
         // Simpan ke database
-           Peminjaman::create([
-        'nama_tamu'     => $request->nama_peminjam,
-        'id_barang'     => $request->id_barang,
-        'jumlah_pinjam' => $request->jumlah_pinjam,
-        'tgl_pinjam'    => now(),
-        'status'        => 'Dipinjam',
-        'catatan'       => "No. Telp: " . $request->no_telp . " | " . $request->catatan, // Simpan no telp ke catatan
-    ]);
+        Peminjaman::create([
+            'nama_tamu'     => $request->nama_peminjam,
+            'id_barang'     => $request->id_barang,
+            'jumlah_pinjam' => $request->jumlah_pinjam,
+            'tgl_pinjam'    => now(),
+            'tgl_kembali'   => $request->tgl_kembali, // Simpan tanggal kembali
+            'status'        => 'Dipinjam',
+            'catatan'       => "No. Telp: " . $request->no_telp . " | " . $request->catatan,
+        ]);
 
         // Kurangi stok barang
         $barang->decrement('stok_total', $request->jumlah_pinjam);
@@ -80,13 +81,14 @@ class PeminjamanController extends Controller
         }
 
         Peminjaman::create([
-    'id_siswa'      => auth()->id(), // Mengambil ID siswa yang sedang login
-    'id_barang'     => $request->id_barang,
-    'jumlah_pinjam' => $request->jumlah_pinjam,
-    'tgl_pinjam'    => now(),
-    'status'        => 'Menunggu Persetujuan',
-    'nama_tamu'     => null, // Karena ini siswa, nama_tamu dikosongkan
-    ]);
+            'id_siswa'      => auth()->id(),
+            'id_barang'     => $request->id_barang,
+            'jumlah_pinjam' => $request->jumlah_pinjam,
+            'tgl_pinjam'    => $request->tgl_pinjam ?? now(), // Gunakan input user
+            'status'        => 'Menunggu Persetujuan',
+            'nama_tamu'     => null,
+            'catatan'       => $request->catatan, // Simpan catatan user
+        ]);
 
     
         

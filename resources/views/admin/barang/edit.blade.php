@@ -43,9 +43,12 @@
                         </div>
 
                         @if($barang->foto_barang)
+                        @php
+                            $filename = str_replace('alat/', '', $barang->foto_barang);
+                        @endphp
                         <div class="mb-4">
                             <label class="d-block mb-2 small fw-bold">Foto Saat Ini:</label>
-                            <img src="{{ asset('storage/' . $barang->foto_barang) }}" width="150" class="rounded border">
+                            <img src="{{ asset('img/alat/' . $filename) }}" width="150" class="rounded border">
                         </div>
                         @endif
 

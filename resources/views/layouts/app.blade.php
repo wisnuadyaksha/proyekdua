@@ -28,7 +28,9 @@
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-outline-warning btn-sm px-4 fw-bold rounded-pill">Login Admin</a>
+                    @if(!request()->routeIs('peminjaman.tamu'))
+                        <a href="{{ route('login') }}" class="btn btn-outline-warning btn-sm px-4 fw-bold rounded-pill">Login Admin</a>
+                    @endif
                 @endauth
             </div>
         </div>

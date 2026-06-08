@@ -1,13 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="mb-4">
+<div class="container">
+    {{-- TOMBOL KEMBALI --}}
+    <div class="mb-3">
+        <a href="{{ route('dashboard.admin') }}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Kembali ke Dashboard
+        </a>
+    </div>
+
+    <div class="mb-4">
     <h3 class="fw-bold">Persetujuan Peminjaman Alat</h3>
     <p class="text-muted">Daftar permintaan peminjaman alat dari siswa dan tamu.</p>
 </div>
 
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
 @endif
 
 <div class="card shadow-sm">
@@ -61,5 +73,6 @@
             </tbody>
         </table>
     </div>
+</div>
 </div>
 @endsection
