@@ -32,10 +32,28 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Jenis Barang</label>
+                                <select name="jenis_barang" class="form-select" required>
+                                    <option value="Aset" {{ $barang->jenis_barang == 'Aset' ? 'selected' : '' }}>Aset (Harus Dikembalikan)</option>
+                                    <option value="Habis Pakai" {{ $barang->jenis_barang == 'Habis Pakai' ? 'selected' : '' }}>Habis Pakai (Contoh: Kabel, Timah)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Satuan</label>
+                                <input type="text" name="satuan" class="form-control" value="{{ $barang->satuan }}" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Stok Total</label>
                                 <input type="number" name="stok_total" class="form-control" value="{{ $barang->stok_total }}" required>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Stok Tersedia</label>
+                                <input type="number" name="stok_tersedia" class="form-control" value="{{ $barang->stok_tersedia }}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-bold">Foto Barang (Opsional)</label>
                                 <input type="file" name="foto_barang" class="form-control">
                                 <small class="text-muted">Kosongkan jika tidak ingin mengubah foto</small>

@@ -18,7 +18,6 @@ class LoginController extends Controller
         $request->validate([
             'login_input' => 'required',
             'password'    => 'required',
-            'role_target' => 'required' // Tambahkan hidden input di form: 'siswa' atau 'admin'
         ]);
 
         $login_input = $request->input('login_input');
@@ -37,14 +36,14 @@ class LoginController extends Controller
             $user = Auth::user();
             $userRole = trim(strtolower($user->role));
 
-            // VALIDASI: Apakah role user sesuai dengan form yang digunakan?
-            if ($userRole !== trim(strtolower($roleTarget))) {
+            // Validasi Role (agar Guru tidak bisa login via form Siswa, dll)
+            if ($roleTarget && $userRole !== $roleTarget) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
 
                 return back()->withErrors([
-                    'login_input' => "Akun Anda terdaftar sebagai $userRole, tidak bisa login di form $roleTarget.",
+                    'login_input' => 'Akses ditolak. Pastikan Anda login melalui tab (' . ucfirst($userRole) . ') yang sesuai dengan peran akun Anda.',
                 ])->onlyInput('login_input');
             }
 
@@ -55,6 +54,14 @@ class LoginController extends Controller
                 return redirect()->intended('/admin/dashboard');
             } 
             
+            if ($userRole === 'guru') {
+                // Cek apakah guru sudah verifikasi email
+                if (!$user->hasVerifiedEmail()) {
+                    return redirect()->route('verification.notice');
+                }
+                return redirect()->intended('/guru/dashboard');
+            }
+
             if ($userRole === 'siswa') {
                 return redirect()->intended('/siswa/dashboard');
             }
@@ -73,5 +80,32 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');
+    }
+
+    public function showForgotPasswordForm()
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'login_input' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $login_input = $request->input('login_input');
+        $fieldType = filter_var($login_input, FILTER_VALIDATE_EMAIL) ? 'email' : 'nis';
+
+        $user = \App\Models\User::where($fieldType, $login_input)->first();
+
+        if (!$user) {
+            return back()->withErrors(['login_input' => 'Akun dengan NIS/Email tersebut tidak ditemukan.'])->onlyInput('login_input');
+        }
+
+        $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        $user->save();
+
+        return redirect()->route('login')->with('success', 'Kata sandi berhasil diperbarui! Silakan login dengan sandi baru.');
     }
 }

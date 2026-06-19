@@ -41,6 +41,47 @@ class PengembalianController extends Controller
         $barang = Barang::findOrFail($pinjaman->id_barang);
         $barang->increment('stok_tersedia', $pinjaman->jumlah_pinjam);
 
+        // Pastikan stok_tersedia tidak melebihi stok_total
+        if ($barang->stok_tersedia > $barang->stok_total) {
+            $barang->stok_tersedia = $barang->stok_total;
+            $barang->save();
+        }
+
         return redirect()->back()->with('success', 'Alat telah berhasil dikembalikan dan stok diperbarui!');
+    }
+
+    /**
+     * Proses Pengembalian Massal (Semua alat sekaligus)
+     */
+    public function storeBulk(Request $request)
+    {
+        $ids = $request->id_peminjaman;
+        if (!$ids) {
+            return back()->with('error', 'Tidak ada data yang dipilih.');
+        }
+
+        foreach ($ids as $id) {
+            $pinjaman = Peminjaman::find($id);
+            if (!$pinjaman || $pinjaman->status !== 'Dipinjam') {
+                continue;
+            }
+
+            $pinjaman->update([
+                'status' => 'Kembali',
+                'tgl_kembali' => now()
+            ]);
+
+            // Kembalikan stok
+            $barang = Barang::find($pinjaman->id_barang);
+            if ($barang) {
+                $barang->increment('stok_tersedia', $pinjaman->jumlah_pinjam);
+                if ($barang->stok_tersedia > $barang->stok_total) {
+                    $barang->stok_tersedia = $barang->stok_total;
+                    $barang->save();
+                }
+            }
+        }
+
+        return redirect()->back()->with('success', 'Semua alat berhasil dikembalikan!');
     }
 }

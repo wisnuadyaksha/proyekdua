@@ -23,6 +23,19 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Jenis Barang</label>
+                            <select name="jenis_barang" class="form-select" required>
+                                <option value="Aset">Aset (Harus Dikembalikan)</option>
+                                <option value="Habis Pakai">Habis Pakai (Contoh: Kabel, Timah)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Satuan</label>
+                            <input type="text" name="satuan" class="form-control" placeholder="Contoh: pcs, meter, roll" value="pcs" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Jumlah Stok</label>
                             <input type="number" name="stok_total" class="form-control" min="1" required>
                         </div>

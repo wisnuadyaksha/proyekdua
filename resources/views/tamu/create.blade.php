@@ -16,8 +16,8 @@
                             <input type="text" name="nama_tamu" class="form-control" placeholder="Masukkan nama Anda" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Asal Instansi / Perusahaan</label>
-                            <input type="text" name="instansi" class="form-control" placeholder="Contoh: SMKN 1 Sindang" required>
+                            <label class="form-label">Asal Jurusan</label>
+                            <input type="text" name="jurusan" class="form-control" placeholder="Contoh: Teknik Otomasi industri" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nomor Telepon/WA</label>

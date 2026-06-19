@@ -18,14 +18,14 @@ class TamuController extends Controller
     {
         $request->validate([
             'nama_tamu' => 'required|string|max:100',
-            'instansi'  => 'required|string|max:100',
+            'jurusan'   => 'required|string|max:100',
             'keperluan' => 'required|string',
             'telepon'   => 'required|numeric',
         ]);
 
         Tamu::create([
             'nama_tamu'     => $request->nama_tamu,
-            'instansi'      => $request->instansi,
+            'instansi'      => $request->jurusan,
             'keperluan'     => $request->keperluan,
             'telepon'       => $request->telepon,
             'tgl_kunjungan' => now(),

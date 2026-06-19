@@ -21,7 +21,8 @@ class Peminjaman extends Model
         'tgl_pinjam', 
         'tgl_kembali', 
         'status', 
-        'catatan'
+        'catatan',
+        'foto_ktp',
     ];
 
     // Relasi ke Barang

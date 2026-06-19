@@ -66,8 +66,9 @@ class BarangController extends Controller
         $barang = Barang::findOrFail($id);
 
         $request->validate([
-            'nama_barang' => 'required|string|max:100',
-            'stok_total'  => 'required|numeric|min:0',
+            'nama_barang'   => 'required|string|max:100',
+            'stok_total'    => 'required|numeric|min:0',
+            'stok_tersedia' => 'required|numeric|min:0|lte:stok_total',
         ]);
 
         $data = $request->all();

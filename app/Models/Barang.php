@@ -21,6 +21,8 @@ class Barang extends Model
         'stok_total',
         'stok_tersedia',
         'kategori',
+        'satuan',
+        'jenis_barang',
         'foto_barang'
     ];
 }

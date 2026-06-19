@@ -29,6 +29,8 @@
                         <th>Nama Barang</th>
                         <th>Kategori</th>
                         <th>Stok (Total/Tersedia)</th>
+                        <th>Satuan</th>
+                        <th>Jenis</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -48,8 +50,16 @@
                         </td>
                         <td class="fw-bold text-primary">{{ $item->nama_barang }}</td>
                         <td><span class="badge bg-info text-dark">{{ $item->kategori }}</span></td>
-                        {{-- Sesuaikan dengan nama kolom di database kamu (stok_total & stok_tersedia) --}}
-                        <td>{{ $item->stok_total }} / <b class="text-success">{{ $item->stok_tersedia }}</b></td>
+                        {{-- Menghindari tampilan minus (jika stok < 0 maka tampilkan 0) --}}
+                        <td>{{ max(0, $item->stok_total) }} / <b class="text-success">{{ max(0, $item->stok_tersedia) }}</b></td>
+                        <td>{{ $item->satuan }}</td>
+                        <td>
+                            @if($item->jenis_barang == 'Aset')
+                                <span class="badge bg-secondary">Aset</span>
+                            @else
+                                <span class="badge bg-warning text-dark">Habis Pakai</span>
+                            @endif
+                        </td>
                         <td class="text-center">
                             {{-- Gunakan id_barang sebagai primary key sesuai model --}}
                             <a href="{{ route('barang.edit', $item->id_barang) }}" class="btn btn-sm btn-light border">
@@ -67,7 +77,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">Belum ada data barang.</td>
+                        <td colspan="8" class="text-center py-5 text-muted">Belum ada data barang.</td>
                     </tr>
                     @endforelse
                 </tbody>

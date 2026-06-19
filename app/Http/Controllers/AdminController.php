@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Peminjaman; // WAJIB ADA
 use App\Models\Barang;
 use App\Models\User;
+use App\Models\Tamu;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
     public function indexSiswa()
     {
-        // Menampilkan semua user yang memiliki NIS (termasuk Admin jika ada NIS-nya)
-        $users = User::whereNotNull('nis')->get(); 
+        // Menampilkan semua user (Siswa, Guru, dan Admin)
+        $users = User::all(); 
         return view('admin.siswa.index', compact('users'));
     }
 
@@ -53,18 +54,30 @@ class AdminController extends Controller
     {
         $siswa = User::findOrFail($id);
         
-        $request->validate([
+        $rules = [
             'name' => 'required',
-            'nis'  => 'required|unique:users,nis,'.$id,
-            'class'=> 'required',
             'password' => 'nullable|min:6',
-        ]);
+        ];
+
+        if ($siswa->role === 'guru') {
+            $rules['email'] = 'required|email|unique:users,email,'.$id;
+        } else {
+            $rules['nis']  = 'required|unique:users,nis,'.$id;
+            $rules['class']= 'required';
+        }
+
+        $request->validate($rules);
 
         $dataToUpdate = [
             'name'  => $request->name,
-            'nis'   => $request->nis,
-            'class' => $request->class,
         ];
+
+        if ($siswa->role === 'guru') {
+            $dataToUpdate['email'] = $request->email;
+        } else {
+            $dataToUpdate['nis']   = $request->nis;
+            $dataToUpdate['class'] = $request->class;
+        }
 
         // Hanya update password jika field password diisi
         if ($request->filled('password')) {
@@ -108,6 +121,8 @@ class AdminController extends Controller
         $request->validate([
             'nama_barang' => 'required',
             'stok_total'  => 'required|integer|min:0',
+            'satuan'      => 'nullable|string|max:50',
+            'jenis_barang'=> 'required|in:Aset,Habis Pakai',
             'kategori'    => 'nullable|string',
             'spesifikasi' => 'nullable|string',
             'foto_barang' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -125,6 +140,8 @@ class AdminController extends Controller
             'nama_barang'   => $request->nama_barang,
             'stok_total'    => $request->stok_total,
             'stok_tersedia' => $request->stok_total,
+            'satuan'        => $request->satuan ?? 'pcs',
+            'jenis_barang'  => $request->jenis_barang,
             'kategori'      => $request->kategori,
             'spesifikasi'   => $request->spesifikasi,
             'foto_barang'   => $fotoPath,
@@ -146,6 +163,9 @@ class AdminController extends Controller
         $request->validate([
             'nama_barang' => 'required',
             'stok_total'  => 'required|integer|min:0',
+            'stok_tersedia'=> 'required|integer|min:0|lte:stok_total',
+            'satuan'      => 'nullable|string|max:50',
+            'jenis_barang'=> 'required|in:Aset,Habis Pakai',
             'kategori'    => 'nullable|string',
             'spesifikasi' => 'nullable|string',
             'foto_barang' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -154,6 +174,9 @@ class AdminController extends Controller
         $data = [
             'nama_barang' => $request->nama_barang,
             'stok_total'  => $request->stok_total,
+            'stok_tersedia'=> $request->stok_tersedia,
+            'satuan'      => $request->satuan ?? 'pcs',
+            'jenis_barang'=> $request->jenis_barang,
             'kategori'    => $request->kategori,
             'spesifikasi' => $request->spesifikasi,
         ];
@@ -180,26 +203,26 @@ class AdminController extends Controller
 
     public function indexTamu()
 {
-    // Mengambil data peminjaman yang peminjamnya adalah TAMU (nama_tamu tidak null)
-    $tamus = Peminjaman::with('barang')
-                ->whereNotNull('nama_tamu')
-                ->latest()
-                ->get();
+    // Mengambil data tamu dari Buku Tamu
+    $tamus = Tamu::latest()->get();
 
     return view('admin.tamu.index', compact('tamus'));
 }
 
    public function prosesPengembalian($id)
     {
-        // PERBAIKAN: Gunakan $peminjaman (tanpa 's') agar konsisten ke bawah
         $peminjaman = Peminjaman::findOrFail($id); 
         $barang = Barang::find($peminjaman->id_barang);
 
-        // Menambah stok saat barang dikembalikan (jika barangnya masih ada)
+        // Menambah stok_tersedia saat barang dikembalikan (stok_total tetap)
         if ($barang) {
-            $barang->increment('stok_total', $peminjaman->jumlah_pinjam);
-            // Tambahkan juga stok_tersedia agar seimbang
             $barang->increment('stok_tersedia', $peminjaman->jumlah_pinjam);
+
+            // Pastikan stok_tersedia tidak melebihi stok_total
+            if ($barang->stok_tersedia > $barang->stok_total) {
+                $barang->stok_tersedia = $barang->stok_total;
+                $barang->save();
+            }
         }
 
         $peminjaman->update([ 
@@ -208,6 +231,37 @@ class AdminController extends Controller
         ]);
 
         return back()->with('success', 'Barang telah berhasil dikembalikan!');
+    }
+
+    public function prosesPengembalianBulk(Request $request)
+    {
+        $ids = $request->id_peminjaman;
+        if (!$ids) {
+            return back()->with('error', 'Tidak ada data yang dipilih.');
+        }
+
+        foreach ($ids as $id) {
+            $peminjaman = Peminjaman::find($id);
+            if (!$peminjaman || $peminjaman->status !== 'Dipinjam') {
+                continue;
+            }
+
+            $barang = Barang::find($peminjaman->id_barang);
+            if ($barang) {
+                $barang->increment('stok_tersedia', $peminjaman->jumlah_pinjam);
+                if ($barang->stok_tersedia > $barang->stok_total) {
+                    $barang->stok_tersedia = $barang->stok_total;
+                    $barang->save();
+                }
+            }
+
+            $peminjaman->update([
+                'status' => 'Dikembalikan',
+                'tgl_kembali' => now()
+            ]);
+        }
+
+        return back()->with('success', 'Semua barang berhasil dikembalikan!');
     }
 
     public function updateStatus(Request $request, $id)
@@ -221,9 +275,17 @@ class AdminController extends Controller
                 return back()->with('error', 'Gagal disetujui! Barang tersebut sudah tidak ada / telah dihapus.');
             }
 
-            // PERBAIKAN: Kurangi stok di kedua kolom (total & tersedia) agar sisa barang berkurang
-            $barang->decrement('stok_total', $peminjaman->jumlah_pinjam);
+            // Kurangi hanya stok_tersedia (stok_total adalah jumlah aset tetap, tidak berubah)
             $barang->decrement('stok_tersedia', $peminjaman->jumlah_pinjam);
+
+            // Jika barang Habis Pakai, langsung ubah status jadi Habis Pakai (Selesai)
+            if ($barang->jenis_barang == 'Habis Pakai') {
+                $peminjaman->update([
+                    'status' => 'Habis Pakai',
+                    'tgl_kembali' => now()
+                ]);
+                return back()->with('success', 'Permintaan barang habis pakai disetujui (Stok berkurang).');
+            }
         }
 
         $peminjaman->update([
@@ -231,6 +293,43 @@ class AdminController extends Controller
         ]);
 
         return back()->with('success', 'Status berhasil diubah menjadi ' . $request->status);
+    }
+
+    // Aksi Massal untuk Persetujuan
+    public function updateStatusBulk(Request $request)
+    {
+        $ids = $request->id_peminjaman;
+        if (!$ids) {
+            return back()->with('error', 'Tidak ada alat yang dipilih.');
+        }
+
+        $status = $request->status;
+
+        foreach ($ids as $id) {
+            $peminjaman = Peminjaman::find($id);
+            if (!$peminjaman || $peminjaman->status !== 'Menunggu Persetujuan') {
+                continue;
+            }
+
+            if ($status == 'Dipinjam') {
+                $barang = Barang::find($peminjaman->id_barang);
+                if (!$barang) continue;
+                
+                // Kurangi stok
+                $barang->decrement('stok_tersedia', $peminjaman->jumlah_pinjam);
+
+                if ($barang->jenis_barang == 'Habis Pakai') {
+                    $peminjaman->update(['status' => 'Habis Pakai', 'tgl_kembali' => now()]);
+                } else {
+                    $peminjaman->update(['status' => 'Dipinjam']);
+                }
+            } else {
+                // Ditolak
+                $peminjaman->update(['status' => $status]);
+            }
+        }
+
+        return back()->with('success', 'Proses massal berhasil dilakukan: ' . $status);
     }
     // Tambahkan method ini di dalam AdminController
     public function indexPengembalian()

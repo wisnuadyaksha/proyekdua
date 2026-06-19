@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Peminjaman - SMKN 1 SINDANG</title>
+    <title>Sistem Peminjaman - Teknik Otomasi Industri</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
@@ -15,8 +15,8 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark py-3 shadow">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url('/') }}">
-                <i class="bi bi-tools me-2 text-warning"></i> SMKN 1 SINDANG
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url('/') }}">
+                <img src="{{ asset('img/logo_smkn1.png') }}" alt="Logo TOI" height="40" class="me-2"> TEKNIK OTOMASI INDUSTRI
             </a>
             
             <div class="ms-auto d-flex align-items-center">

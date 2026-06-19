@@ -28,6 +28,12 @@ class PersetujuanController extends Controller
         if ($request->status == 'Ditolak') {
             $barang = Barang::findOrFail($pinjaman->id_barang);
             $barang->increment('stok_tersedia', $pinjaman->jumlah_pinjam);
+
+            // Pastikan stok_tersedia tidak melebihi stok_total
+            if ($barang->stok_tersedia > $barang->stok_total) {
+                $barang->stok_tersedia = $barang->stok_total;
+                $barang->save();
+            }
         }
 
         return redirect()->back()->with('success', 'Status peminjaman berhasil diperbarui!');
@@ -55,7 +61,7 @@ class PersetujuanController extends Controller
 
         $barang = Barang::findOrFail($request->id_barang);
 
-        if ($barang->stok_total < $request->jumlah_pinjam) {
+        if ($barang->stok_tersedia < $request->jumlah_pinjam) {
             return back()->with('error', 'Stok barang tidak mencukupi!');
         }
 }

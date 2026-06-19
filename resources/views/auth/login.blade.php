@@ -14,17 +14,22 @@
 </head>
 <body class="bg-slate-200/50 min-h-screen flex items-center justify-center p-4">
 
-    <div class="w-full max-w-[600px] bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white">
+    <!-- Tombol Kembali ke Home -->
+    <a href="{{ url('/') }}" class="absolute top-6 left-6 flex items-center gap-2 text-slate-500 hover:text-slate-800 font-semibold transition-all">
+        <i class="fa-solid fa-arrow-left"></i> Kembali ke Home
+    </a>
+
+    <div class="w-full max-w-[500px] bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white">
         
         <div class="bg-slate-100 p-2 flex gap-1 m-6 rounded-2xl">
-            <button onclick="switchTab('siswa')" id="btn-siswa" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all tab-active">
+            <button onclick="switchTab('siswa')" id="btn-siswa" class="flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all tab-active">
                 Siswa
             </button>
-            <button onclick="switchTab('admin')" id="btn-admin" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 transition-all">
-                Admin
+            <button onclick="switchTab('guru')" id="btn-guru" class="flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all text-slate-500">
+                Guru
             </button>
-            <button onclick="switchTab('tamu')" id="btn-tamu" class="flex-1 py-3 px-4 rounded-xl text-sm font-bold text-slate-500 transition-all">
-                Tamu
+            <button onclick="switchTab('admin')" id="btn-admin" class="flex-1 py-3 px-2 rounded-xl text-sm font-bold transition-all text-slate-500">
+                Admin
             </button>
         </div>
 
@@ -44,57 +49,88 @@
                 </div>
                 <form action="{{ route('login') }}" method="POST" class="space-y-4">
                     @csrf
-                    {{-- PENTING: Penanda bahwa ini form Siswa --}}
                     <input type="hidden" name="role_target" value="siswa">
-                    
                     <div>
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Nomor Induk Siswa (NIS)</label>
-                        <input type="text" name="login_input" placeholder="Masukkan NIS Anda" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 focus:border-blue-500 focus:bg-white outline-none transition-all" required>
+                        <input type="text" name="login_input" placeholder="Masukkan NIS Anda" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 focus:border-blue-500 focus:bg-white outline-none transition-all" required autofocus>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Kata Sandi</label>
-                        <input type="password" name="password" placeholder="••••••••" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 focus:border-blue-500 focus:bg-white outline-none transition-all" required>
+                        <div class="flex justify-between items-center mb-2 ml-1">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Kata Sandi</label>
+                            <a href="{{ route('password.request') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors">Lupa sandi?</a>
+                        </div>
+                        <div class="relative">
+                            <input type="password" name="password" id="pass-siswa" placeholder="••••••••" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 focus:border-blue-500 focus:bg-white outline-none transition-all" required>
+                            <button type="button" onclick="togglePassword('pass-siswa', 'icon-siswa')" class="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-slate-600">
+                                <i class="fa-solid fa-eye-slash" id="icon-siswa"></i>
+                            </button>
+                        </div>
                     </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-[0.98]">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-[0.98] mt-4">
                         Masuk Sekarang
                     </button>
                 </form>
+                <p class="text-center text-sm text-slate-400 mt-4">Belum punya akun? <a href="{{ route('register') }}" class="text-blue-600 font-semibold hover:underline">Daftar di sini</a></p>
+            </div>
+
+            {{-- FORM LOGIN GURU --}}
+            <div id="form-guru" class="tab-content hidden">
+                <div class="text-center mb-8">
+                    <h1 class="text-2xl font-bold text-slate-800">Panel Guru 📚</h1>
+                    <p class="text-slate-500 text-sm mt-1">Gunakan Email dan Password untuk masuk</p>
+                </div>
+                <form action="{{ route('login') }}" method="POST" class="space-y-4">
+                    @csrf
+                    <input type="hidden" name="role_target" value="guru">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Email Sekolah</label>
+                        <input type="email" name="login_input" placeholder="contoh@sekolah.com" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 focus:border-amber-500 focus:bg-white outline-none transition-all" required>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2 ml-1">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Kata Sandi</label>
+                            <a href="{{ route('password.request') }}" class="text-xs font-semibold text-amber-600 hover:text-amber-800 transition-colors">Lupa sandi?</a>
+                        </div>
+                        <div class="relative">
+                            <input type="password" name="password" id="pass-guru" placeholder="••••••••" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 focus:border-amber-500 focus:bg-white outline-none transition-all" required>
+                            <button type="button" onclick="togglePassword('pass-guru', 'icon-guru')" class="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-slate-600">
+                                <i class="fa-solid fa-eye-slash" id="icon-guru"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-amber-200 transition-all active:scale-[0.98] mt-4">
+                        Masuk Sekarang
+                    </button>
+                </form>
+                <p class="text-center text-sm text-slate-400 mt-4">Belum punya akun? <a href="{{ route('register') }}" class="text-blue-600 font-semibold hover:underline">Daftar di sini</a></p>
             </div>
 
             {{-- FORM LOGIN ADMIN --}}
             <div id="form-admin" class="tab-content hidden">
                 <div class="text-center mb-8">
                     <h1 class="text-2xl font-bold text-slate-800">Panel Admin 🔐</h1>
-                    <p class="text-slate-500 text-sm mt-1">Gunakan Email Admin Anda</p>
+                    <p class="text-slate-500 text-sm mt-1">Gunakan Email dan Password untuk masuk</p>
                 </div>
                 <form action="{{ route('login') }}" method="POST" class="space-y-4">
                     @csrf
-                    {{-- PENTING: Penanda bahwa ini form Admin --}}
                     <input type="hidden" name="role_target" value="admin">
-
                     <div>
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Email Admin</label>
                         <input type="email" name="login_input" placeholder="admin@sekolah.com" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 focus:border-slate-800 focus:bg-white outline-none transition-all" required>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Kata Sandi</label>
-                        <input type="password" name="password" placeholder="••••••••" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 focus:border-slate-800 focus:bg-white outline-none transition-all" required>
+                        <div class="relative">
+                            <input type="password" name="password" id="pass-admin" placeholder="••••••••" class="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3.5 focus:border-slate-800 focus:bg-white outline-none transition-all" required>
+                            <button type="button" onclick="togglePassword('pass-admin', 'icon-admin')" class="absolute inset-y-0 right-4 flex items-center text-slate-400 hover:text-slate-600">
+                                <i class="fa-solid fa-eye-slash" id="icon-admin"></i>
+                            </button>
+                        </div>
                     </div>
-                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg shadow-slate-200 transition-all active:scale-[0.98]">
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-4 rounded-xl shadow-lg shadow-slate-200 transition-all active:scale-[0.98] mt-4">
                         Masuk ke Panel
                     </button>
                 </form>
-            </div>
-
-            {{-- TAB TAMU --}}
-            <div id="form-tamu" class="tab-content hidden text-center py-4">
-                <div class="bg-blue-50 p-6 rounded-2xl mb-6 border border-blue-100">
-                    <i class="fa-solid fa-circle-info text-blue-500 text-2xl mb-3"></i>
-                    <p class="text-blue-900 font-medium text-sm">Anda bisa meminjam alat tanpa akun.</p>
-                </div>
-                <a href="{{ route('peminjaman.tamu') }}" class="inline-block w-full bg-white border-2 border-slate-200 text-slate-700 font-bold py-3.5 rounded-xl hover:bg-slate-50 no-underline">
-                    Lanjutkan Pinjam Alat (Tamu)
-                </a>
             </div>
         </div>
     </div>
@@ -104,14 +140,29 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('form-' + type).classList.remove('hidden');
             
-            document.querySelectorAll('[id^=\"btn-\"]').forEach(el => {
-                el.classList.remove('tab-active', 'text-black');
+            document.querySelectorAll('[id^="btn-"]').forEach(el => {
+                el.classList.remove('tab-active', 'text-slate-800');
                 el.classList.add('text-slate-500');
             });
             
             const activeBtn = document.getElementById('btn-' + type);
             activeBtn.classList.add('tab-active');
             activeBtn.classList.remove('text-slate-500');
+        }
+
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
         }
     </script>
 </body>

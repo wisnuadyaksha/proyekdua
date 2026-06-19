@@ -60,8 +60,8 @@
         <div class="col-md-4 mb-4">
             <div class="card shadow-sm border-0 p-4 text-center h-100">
                 <i class="bi bi-file-earmark-bar-graph text-danger mb-3" style="font-size: 2.5rem;"></i>
-                <h5 class="fw-bold">Laporan</h5>
-                <p class="small text-muted">Rekapitulasi dan cetak laporan peminjaman.</p>
+                <h5 class="fw-bold">Laporan & Rekap</h5>
+                <p class="small text-muted">Laporan peminjaman & rekap bulanan.</p>
                 <a href="{{ route('laporan.index') }}" class="btn btn-danger mt-auto rounded-pill">Buka Laporan</a>
             </div>
         </div>
